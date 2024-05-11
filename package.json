@@ -1,0 +1,33 @@
+{
+  "name": "whatsapp-bot-api",
+  "version": "1.0.0",
+  "description": "Whatsapp bot api",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon -q src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MohitPatel1/whatsapp-bot-api.git"
+  },
+  "keywords": [
+    "whatsapp"
+  ],
+  "author": "Mohit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MohitPatel1/whatsapp-bot-api/issues"
+  },
+  "homepage": "https://github.com/MohitPatel1/whatsapp-bot-api#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@bot-wa/bot-wa-baileys": "^1.1.3",
+    "express": "^4.19.2"
+  }
+}
