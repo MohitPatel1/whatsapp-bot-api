@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/MohitPatel1/whatsapp-bot-api#readme",
   "devDependencies": {
+    "@types/node": "^18.15.11",
     "@types/express": "^4.17.21",
     "nodemon": "^2.0.22",
     "typescript": "^5.4.5"

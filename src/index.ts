@@ -1,10 +1,18 @@
 import { BaileysClass } from '@bot-wa/bot-wa-baileys';
+import { fetchRequest } from './utils/fetchrequest';
+import { whatsaphoneSettingMapping, whatsappAlert } from './utils/types';
+import { getPollOptions } from './utils/getPoll';
 
 const botBaileys = new BaileysClass({});
-
+let phoneSettingMapping : Record<string,whatsaphoneSettingMapping>;
 botBaileys.on('auth_failure', async (error) => console.log("ERROR BOT: ", error));
 botBaileys.on('qr', (qr) => console.log("NEW QR CODE: ", qr));
-botBaileys.on('ready', async () => console.log('READY BOT'))
+botBaileys.on('ready', async () => {
+  // get all phone numbers with og_id map
+  phoneSettingMapping = await fetchRequest('/whatsapp/phoneSettingMapping');
+  console.log({phoneSettingMapping})
+  console.log('READY BOT');
+})
 
 let awaitingResponse = false;
 function endsWithWhatsAppNet(str: string): boolean {
@@ -14,27 +22,38 @@ function endsWithWhatsAppNet(str: string): boolean {
 
 botBaileys.on('message', async (message) => {
     console.log(message)
-    if(message.body && message.type && endsWithWhatsAppNet(message.key.participant)){
+    if(message.body && message.type && endsWithWhatsAppNet(message.from)){
       if (!awaitingResponse) {
-          await botBaileys.sendPoll(message.from, 'Select an option', {
-              options: ['text', 'media', 'file', 'sticker'],
-              multiselect: true
-          });
+        console.log(message.from.slice(2,12))
+        const sender:whatsaphoneSettingMapping = phoneSettingMapping[message.from.slice(2,12)]
+        console.log(sender)
+        if(sender){
+          const pollOptions:string[] = getPollOptions(sender.waAlertSettings);
+          await botBaileys.sendPoll(message.from.slice(0,12), sender.name, {
+            options: pollOptions,
+            multiselect: false
+        });
+        }else{
+          console.log("bot ")
+          // send standard data
+          // you don't have a licence to access smart agent bot
+        }
           awaitingResponse = true;
           } else {
-            const command = message.body.toLowerCase().trim();
+            let command = message.type;
+            if( message.type === 'poll'){
+              command = message.body
+            }
             switch (command) {
-                case 'text':
-                    await botBaileys.sendText(message.from, 'Hello world');
-                case 'media':
-                    await botBaileys.sendMedia(message.from, 'https://www.w3schools.com/w3css/img_lights.jpg', 'Hello world');
+                case 'Reminders':
+                    // const message = await fetch(phone_number,og_id)
+                    await botBaileys.sendText(message.from, 'Hello from mohit');
                     break;
-                case 'file':
-                    await botBaileys.sendFile(message.from, 'https://github.com/pedrazadixon/sample-files/raw/main/sample_pdf.pdf');
-                case 'sticker':
-                    await botBaileys.sendSticker(message.from, 'https://gifimgs.com/animations/anime/dragon-ball-z/Goku/goku_34.gif', { pack: 'User', author: 'Me' });
+                case 'Snap Shot':
+                    await botBaileys.sendText(message.from, 'https://www.w3schools.com/w3css/img_lights.jpg');
+                    break;
                 default:
-                    await botBaileys.sendText(message.from, 'Sorry, I did not understand that command. Please select an option from the poll.');
+                    await botBaileys.sendText(message.from, 'www.smartagent.one');
             }
             awaitingResponse = false;
           }}
