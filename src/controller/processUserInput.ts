@@ -34,6 +34,6 @@ export async function processString(inputString: string,og_id:string): Promise<s
         case detectedKeywords.order :
             return fetchRequest(`/whatsapp/order/${og_id}?${queryString}`);
         default:
-            return fetchRequest(`/whatsapp/snapshot/${og_id}`)
+            return "Please Select A Value From Above poll"
     };
 }
