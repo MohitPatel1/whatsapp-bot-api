@@ -11,7 +11,6 @@ botBaileys.on('qr', (qr) => console.log("NEW QR CODE: ", qr));
 botBaileys.on('ready', async () => {
   // get all phone numbers with og_id map
   phoneSettingMapping = await fetchRequest('/whatsapp/phoneSettingMapping');
-  console.log({phoneSettingMapping})
   console.log('READY BOT');
 })
 

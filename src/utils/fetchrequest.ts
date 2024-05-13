@@ -42,13 +42,5 @@ export const fetchRequest = async (route: string, options: any = {}) => {
     })
     .catch((err)  => {
         console.error({ route, err }); 
-        clearTimeout(abortTimeout);
-        if (err.name == 'AbortError') { // handle abort()
-            controller = new AbortController();
-            signal = controller.signal;
-            console.error("Aborted!");
-            throw new Error("Server taking too long to respond. Please try again.");
-        };
-        throw err;
     });
 };
