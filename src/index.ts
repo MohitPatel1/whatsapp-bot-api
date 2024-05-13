@@ -45,7 +45,7 @@ botBaileys.on('message', async (message) => {
             multiselect: false
           })
         }else{
-          await botBaileys.sendText(message.from, `you don't have a licence to access smart agent bot`);        
+          await botBaileys.sendText(message.from, `You Don't Have A Licence To Access Smart Agent Bot. Get Your License From www.smartagent.one Now.`);        
         }
         awaitingResponse = true;
       } else {    
