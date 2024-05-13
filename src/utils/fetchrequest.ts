@@ -1,5 +1,5 @@
 import { be_url } from "./config";
-
+require('dotenv').config();
 
 let controller = new AbortController();
 let signal = controller.signal;
@@ -9,7 +9,7 @@ export const postOptions = (options: any) => ({
     headers: {
         Accept: 'application.json',
         'Content-Type': 'application/json',
-        "whatsappSecret": process.env.WHATSAPP_SECRET,
+        "whatsappsecret":  process.env.WHATSAPP_SECRET,
         ...options?.headers
     },
     body: typeof options?.body === "string" ? options.body : JSON.stringify(options.body),
@@ -23,7 +23,7 @@ export const fetchRequest = async (route: string, options: any = {}) => {
     // Cancel the fetch request in 20000ms;
     // https://javascript.info/fetch-abort;
     let abortTimeout = setTimeout(() => controller.abort(), (options.waitTime || 20000));
-
+    console.log(be_url)
     return await fetch(
         be_url + route, postOptions(options)
     )
