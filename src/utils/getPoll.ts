@@ -1,8 +1,8 @@
 import { waAlertSettings, whatsappAlert } from "./types";
 
-const stringOboveOrBellow = (number:number) => {
-    if(number > 0) return `Above ${number} Days`
-    if(number < 0) return `Below ${number * (-1)} Days`
+const stringOboveOrBefore = (number:number) => {
+    if(number > 0) return `After ${number} Days`
+    if(number < 0) return `Before ${number * (-1)} Days`
     return 'Today'
 }
 
@@ -12,29 +12,23 @@ export const getPollOptions = (waAlertSettings:waAlertSettings[]): string[] => {
         if(setting.setting_name === 'whatsapp_invoice_alerts'){
             setting.whatsappAlert && setting.whatsappAlert.forEach((alert:whatsappAlert) => {
                 if(alert.calculate_from == 'Invoice Date'){
-                    pollData.push(`Invoice date ${stringOboveOrBellow(alert.days_to_add)}`)
+                    pollData.push(`Invoice Date ${stringOboveOrBefore(alert.days_to_add)}`)
                 }else{
-                    pollData.push(`Invoice Due ${stringOboveOrBellow(alert.days_to_add)}`)
+                    pollData.push(`Invoice Due ${stringOboveOrBefore(alert.days_to_add)}`)
                 }
             })
         }
         else if(setting.setting_name === 'whatsapp_order_alerts'){
             setting.whatsappAlert && setting.whatsappAlert.forEach((alert:whatsappAlert) => {
                 if(alert.calculate_from == 'Order Date'){
-                    pollData.push(`Order date ${stringOboveOrBellow(alert.days_to_add)}`)
+                    pollData.push(`Order Date ${stringOboveOrBefore(alert.days_to_add)}`)
                 }else{
-                    pollData.push(`Order Due ${stringOboveOrBellow(alert.days_to_add)}`)
+                    pollData.push(`Order Due ${stringOboveOrBefore(alert.days_to_add)}`)
                 }
             })
-        }else{
-            pollData.push('Reminders', 'Snap Shot')
         }
-
-        return pollData
     });
+    pollData.push("Today's Snap Shot") // 'Outstanding'        
 
-
-
-
-    return ['Reminders', 'Snap Shot'] // 'Outstanding'
+    return pollData 
 }

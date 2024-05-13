@@ -2,6 +2,7 @@ import { BaileysClass } from '@bot-wa/bot-wa-baileys';
 import { fetchRequest } from './utils/fetchrequest';
 import { whatsaphoneSettingMapping, whatsappAlert } from './utils/types';
 import { getPollOptions } from './utils/getPoll';
+import { processString } from './controller/processUserInput';
 
 const botBaileys = new BaileysClass({});
 let phoneSettingMapping : Record<string,whatsaphoneSettingMapping>;
@@ -22,44 +23,50 @@ function endsWithWhatsAppNet(str: string): boolean {
 
 botBaileys.on('message', async (message) => {
     console.log(message)
-    if(message.body && message.type && endsWithWhatsAppNet(message.from)){
-      if (!awaitingResponse) {
-        console.log(message.from.slice(2,12))
-        const sender:whatsaphoneSettingMapping = phoneSettingMapping[message.from.slice(2,12)]
+    if(message.body && endsWithWhatsAppNet(message.from)){
+      console.info({message}) // keep it here
+      const intervalId = setInterval(() => {
+        console.log("Getting phone registary");
+      }, 1000);
+    
+      while (!phoneSettingMapping) {
+          // Waiting for phoneSettingMapping to become present
+      }
+      
+      // Clear the interval once phoneSettingMapping is present
+      clearInterval(intervalId);
+
+      const sender:whatsaphoneSettingMapping = phoneSettingMapping[message.from.slice(2,12)]
+      if (!awaitingResponse && message.type != 'poll') {
         console.log(sender)
-        if(sender){
+        if(sender && !awaitingResponse){
           const pollOptions:string[] = getPollOptions(sender.waAlertSettings);
-          await botBaileys.sendPoll(message.from.slice(0,12), sender.name, {
+          await botBaileys.sendPoll(message.from, `Hello, ${sender.name} Please selcet one of the options`, {
             options: pollOptions,
             multiselect: false
-        });
+          })
         }else{
-          console.log("bot ")
-          // send standard data
-          // you don't have a licence to access smart agent bot
+          await botBaileys.sendText(message.from, `you don't have a licence to access smart agent bot`);        
         }
-          awaitingResponse = true;
-          } else {
-            let command = message.type;
-            if( message.type === 'poll'){
-              command = message.body
-            }
-            switch (command) {
-                case 'Reminders':
-                    // const message = await fetch(phone_number,og_id)
-                    await botBaileys.sendText(message.from, 'Hello from mohit');
-                    break;
-                case 'Snap Shot':
-                    await botBaileys.sendText(message.from, 'https://www.w3schools.com/w3css/img_lights.jpg');
-                    break;
-                default:
-                    await botBaileys.sendText(message.from, 'www.smartagent.one');
-            }
-            awaitingResponse = false;
-          }}
-        else{
-        console.log("body not found in message")
-      }
+        awaitingResponse = true;
+      } else {    
+        try{
+          const resMsg = await processString(message.body,sender.og_id);
+          if(Array.isArray(resMsg)){
+            resMsg.forEach(async(msg:string) => {
+              await botBaileys.sendText(message.from, msg);
+            });
+          }else{
+            await botBaileys.sendText(message.from, resMsg);
+          }
+          awaitingResponse = false;
+        }catch(e){
+          console.error(e)
+        }     
+    }}
+      else{
+      console.log("body not found in message")
+    }
 });
 
 
