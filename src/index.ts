@@ -40,7 +40,7 @@ botBaileys.on('message', async (message) => {
         console.log(sender)
         if(sender && !awaitingResponse){
           const pollOptions:string[] = getPollOptions(sender.waAlertSettings);
-          await botBaileys.sendPoll(message.from, `Hello, ${sender.name} Please selcet one of the options`, {
+          await botBaileys.sendPoll(message.from, `Hello, ${sender.name} Please Select One Of The Options`, {
             options: pollOptions,
             multiselect: false
           })
