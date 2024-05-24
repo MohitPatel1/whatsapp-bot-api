@@ -23,8 +23,7 @@ function endsWithWhatsAppNet(str: string): boolean {
 botBaileys.on('message', async (message) => {
     console.log(message)
     if(message.body && endsWithWhatsAppNet(message.from)){
-      console.info({message}) // keep it here
-    
+      console.info({message}) // keep it here    
       if (phoneSettingMapping) {      
         const sender:whatsaphoneSettingMapping = phoneSettingMapping[message.from.slice(2,12)]
         if (!awaitingResponse && message.type != 'poll') {
@@ -54,8 +53,10 @@ botBaileys.on('message', async (message) => {
           }     
     }}
       else{
-      phoneSettingMapping = await fetchRequest('/whatsapp/phoneSettingMapping');
-      console.log("phoneSettingMapping not found")
+        phoneSettingMapping = await fetchRequest('/whatsapp/phoneSettingMapping');
+        console.log({phoneSettingMapping})
+        await botBaileys.sendText(message.from, "Validating Phone Number License, Please Send Another Message.");      
+        console.log("phoneSettingMapping not found")
     }
   }
 });

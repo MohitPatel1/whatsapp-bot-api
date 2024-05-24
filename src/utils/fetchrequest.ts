@@ -1,46 +1,45 @@
 import { be_url } from "./config";
 require('dotenv').config();
 
-let controller = new AbortController();
-let signal = controller.signal;
-
-export const postOptions = (options: any) => ({
+export const postOptions = (options: any, signal: AbortSignal): RequestInit => ({
     method: options?.method || 'GET',
     headers: {
-        Accept: 'application.json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        "whatsappsecret":  process.env.WHATSAPP_SECRET,
+        "whatsappsecret": process.env.WHATSAPP_SECRET,
         ...options?.headers
     },
     body: typeof options?.body === "string" ? options.body : JSON.stringify(options.body),
-    cache: options?.cache || 'no-store',
     credentials: options?.credentials || "include",
-    data: options?.data ||null,
     signal
 });
 
-export const fetchRequest = async (route: string, options: any = {}) => {
+export const fetchRequest = async (route: string, options: any = {}): Promise<any> => {
+    let controller = new AbortController();
+    let signal = controller.signal;
+
     // Cancel the fetch request in 20000ms;
-    // https://javascript.info/fetch-abort;
-    let abortTimeout = setTimeout(() => controller.abort(), (options.waitTime || 20000));
-    console.log(be_url)
-    return await fetch(
-        be_url + route, postOptions(options)
-    )
-    .then(async res => {
+    let abortTimeout = setTimeout(() => controller.abort(), options.waitTime || 20000);
+    console.log(be_url);
+
+    try {
+        const response = await fetch(be_url + route, postOptions(options, signal));
         clearTimeout(abortTimeout);
-        if (!res || !res.ok || res.status >= 400 ) {
-            throw res;
-        };
-        
-        let response:any = await res.json();
-        if (response.status === 'error') {
+
+        if (!response.ok || response.status >= 400) {
             throw response;
-        } else {
-            return response.payload ?? response;
         }
-    })
-    .catch((err)  => {
-        console.error({ route, err }); 
-    });
+
+        const responseData = await response.json() as { status: string; payload?: any; };
+        console.log(responseData);
+
+        if (responseData.status === 'error') {
+            console.error("error occured in fetching data")
+        } else {
+            return responseData.payload ?? responseData;
+        }
+    } catch (err) {
+        clearTimeout(abortTimeout);
+        console.error({ route, err });
+    }
 };
